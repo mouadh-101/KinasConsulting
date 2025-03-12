@@ -258,7 +258,7 @@ export default function KinasConsulting() {
             <div className="mb-8 flex justify-center md:mb-0 md:w-1/3">
               <div className="relative h-40 w-40 overflow-hidden rounded-full border-4 border-[#09B2A0] shadow-lg transition-transform duration-500 hover:scale-105 hover:shadow-xl">
                 <Image
-                  src="kinasConsultingLogo.png"
+                  src="/kinasConsultingLogo.png"
                   alt="Kinas Consulting Logo"
                   width={160}
                   height={160}
@@ -280,7 +280,7 @@ export default function KinasConsulting() {
             <div className="mb-8 flex justify-center md:mb-0 md:w-1/3">
               <div className="group relative h-64 w-64 overflow-hidden rounded-lg shadow-lg transition-all duration-500 hover:shadow-xl">
                 <Image
-                  src="MouadhGammoudi.jpeg"
+                  src="/MouadhGammoudi.jpeg"
                   alt="Mouadh Gammoudi - Founder"
                   fill
                   className="object-cover object-center transition-transform duration-700 group-hover:scale-110"
