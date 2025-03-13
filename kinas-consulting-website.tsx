@@ -217,7 +217,7 @@ export default function KinasConsulting() {
             <Link href="#" className="flex items-center gap-2" onClick={() => scrollToSection("hero")}>
               <div className="relative h-10 w-10 overflow-hidden rounded-full border-2 border-[#09B2A0]">
                 <Image
-                  src="/kinasConsultingLogo.png"
+                  src="/KinasConsultingLogo.png"
                   alt="Kinas Consulting Logo"
                   width={40}
                   height={40}
@@ -359,7 +359,7 @@ export default function KinasConsulting() {
             <div className="mb-8 flex justify-center md:mb-0 md:w-1/3">
               <div className="relative h-40 w-40 overflow-hidden rounded-full border-4 border-[#09B2A0] shadow-lg transition-transform duration-500 hover:scale-105 hover:shadow-xl">
                 <Image
-                  src="/kinasConsultingLogo.png"
+                  src="/KinasConsultingLogo.png"
                   alt="Kinas Consulting Logo"
                   width={160}
                   height={160}

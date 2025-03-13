@@ -3,7 +3,7 @@ import './globals.css'
 
 export const metadata: Metadata = {
   title: 'Kinas Consulting',
-  icons:'/kinasConsultingLogo.png',
+  icons:'/KinasConsultingLogo.png',
   description: "Kinas Consulting accompagne les institutions nationales et internationales dans la conception, la gestion et l'évaluation de projets à fort impact.",
   creator: 'Mouadh Gammoudi',
 }
