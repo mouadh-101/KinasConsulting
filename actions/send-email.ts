@@ -1,6 +1,7 @@
+// actions/send-email.ts
 "use server"
-
 import { z } from "zod"
+import nodemailer from "nodemailer"
 
 // Form validation schema
 const formSchema = z.object({
@@ -12,30 +13,45 @@ const formSchema = z.object({
 
 export type FormData = z.infer<typeof formSchema>
 
+/**
+ * Sends an email using Nodemailer.
+ * This function is restricted to server-side execution.
+ */
 export async function sendEmail(formData: FormData) {
   try {
-    // Validate form data
+    // Validate form data using Zod schema
     const validatedData = formSchema.parse(formData)
 
-    // Prepare email content
+    // Configure Nodemailer transporter
+    const transporter = nodemailer.createTransport({
+      service: "Outlook", // Replace with your email service provider
+      auth: {
+        user: process.env.OUTLOOK_EMAIL, // Sender email address
+        pass: process.env.OUTLOOK_PASSWORD, // App password or regular password
+      },
+    })
+
+    // Email content
     const emailContent = `
       Nouveau message de: ${validatedData.name}
       Email: ${validatedData.email}
       Sujet: ${validatedData.subject}
-      
+
       Message:
       ${validatedData.message}
     `
 
-    // In a real implementation, you would use a service like Nodemailer, SendGrid, etc.
-    // For demonstration, we'll simulate sending an email
-    console.log("Sending email to: mouadhgammoudi13@gmail.com")
-    console.log("Email content:", emailContent)
+    // Email options
+    const mailOptions = {
+      from: process.env.OUTLOOK_EMAIL || "your-email@outlook.com",
+      to: "mouadhgammoudi13@gmail.com", // Receiver email
+      subject: `Nouveau message de ${validatedData.name} - ${validatedData.subject}`,
+      text: emailContent,
+    }
 
-    // Simulate API call delay
-    await new Promise((resolve) => setTimeout(resolve, 1000))
+    // Send email using Nodemailer
+    await transporter.sendMail(mailOptions)
 
-    // Return success
     return { success: true, message: "Votre message a été envoyé avec succès!" }
   } catch (error) {
     console.error("Error sending email:", error)
@@ -49,4 +65,3 @@ export async function sendEmail(formData: FormData) {
     return { success: false, message: "Une erreur s'est produite lors de l'envoi du message." }
   }
 }
-

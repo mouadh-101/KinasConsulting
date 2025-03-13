@@ -2,6 +2,6 @@
 
 import KinasConsulting from "../kinas-consulting-website"
 
-export default function SyntheticV0PageForDeployment() {
+export default function KinasConsultingForDeployment() {
   return <KinasConsulting />
 }

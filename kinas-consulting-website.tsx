@@ -1,111 +1,215 @@
-"use client"
+"use client";
+import type React from "react";
+import { useState, useEffect } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import {
+  Mail,
+  MapPin,
+  Phone,
+  Linkedin,
+  Instagram,
+  Menu,
+  X,
+  ChevronUp,
+  CheckCircle,
+  AlertCircle,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { cn } from "@/lib/utils";
+import { sendEmail, type FormData } from "./actions/send-email";
 
-import type React from "react"
+// Constants
+const EMAIL_ADDRESS = "kinasconsult@gmail.com";
 
-import { useState, useEffect } from "react"
-import Image from "next/image"
-import Link from "next/link"
-import { Mail, MapPin, Phone, Linkedin, Instagram, Menu, X, ChevronUp, CheckCircle, AlertCircle } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { cn } from "@/lib/utils"
-import { sendEmail, type FormData } from "./actions/send-email"
-
-export default function KinasConsulting() {
-  const [formData, setFormData] = useState<FormData>({
+// Contact Form Component
+const ContactForm = () => {
+  const [formData, setFormData] = useState({
     name: "",
     email: "",
     subject: "",
     message: "",
-  })
-  const [formStatus, setFormStatus] = useState<{
-    isSubmitting: boolean
-    isSubmitted: boolean
-    success?: boolean
-    message?: string
-  }>({
+  });
+  const [formStatus, setFormStatus] = useState({
     isSubmitting: false,
     isSubmitted: false,
-  })
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const [scrolled, setScrolled] = useState(false)
-  const [showScrollTop, setShowScrollTop] = useState(false)
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 50)
-      setShowScrollTop(window.scrollY > 500)
-    }
-    window.addEventListener("scroll", handleScroll)
-    return () => window.removeEventListener("scroll", handleScroll)
-  }, [])
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target
-    setFormData((prev) => ({ ...prev, [name]: value }))
-  }
+    success: false,
+    message: "",
+  });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setFormStatus({ isSubmitting: true, isSubmitted: false })
-
+  
+    setFormStatus({ ...formStatus, isSubmitting: true, isSubmitted: false })
+  
     try {
       const result = await sendEmail(formData)
-
-      setFormStatus({
-        isSubmitting: false,
-        isSubmitted: true,
-        success: result.success,
-        message: result.message,
-      })
-
       if (result.success) {
-        // Reset form on success
-        setFormData({ name: "", email: "", subject: "", message: "" })
-
-        // Clear success message after 5 seconds
-        setTimeout(() => {
-          setFormStatus((prev) => ({ ...prev, isSubmitted: false }))
-        }, 5000)
+        setFormStatus({
+          isSubmitting: false,
+          isSubmitted: true,
+          success: true,
+          message: result.message,
+        })
+        setFormData({
+          name: "",
+          email: "",
+          subject: "",
+          message: "",
+        }) // Clear the form fields
+      } else {
+        setFormStatus({
+          isSubmitting: false,
+          isSubmitted: true,
+          success: false,
+          message: result.message,
+        })
       }
     } catch (error) {
-      console.error("Error submitting form:", error)
       setFormStatus({
         isSubmitting: false,
         isSubmitted: true,
         success: false,
-        message: "Une erreur s'est produite. Veuillez réessayer plus tard.",
+        message: "Une erreur s'est produite lors de l'envoi du message.",
       })
     }
   }
 
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="flex h-full flex-col rounded-lg bg-white p-6 shadow-lg">
+      {formStatus.isSubmitted && (
+        <div
+          className={`mb-4 flex items-center rounded-md p-3 ${
+            formStatus.success ? "bg-green-50 text-green-700" : "bg-red-50 text-red-700"
+          }`}
+        >
+          {formStatus.success ? (
+            <CheckCircle className="mr-2 h-5 w-5 text-green-500" />
+          ) : (
+            <AlertCircle className="mr-2 h-5 w-5 text-red-500" />
+          )}
+          <span>{formStatus.message}</span>
+        </div>
+      )}
+      <div className="flex-1 space-y-4">
+        <Input
+          type="text"
+          name="name"
+          placeholder="Nom"
+          value={formData.name}
+          onChange={handleChange}
+          required
+          className="border-[#09B2A0] focus-visible:ring-[#09B2A0]"
+          disabled={formStatus.isSubmitting}
+        />
+        <Input
+          type="email"
+          name="email"
+          placeholder="Email"
+          value={formData.email}
+          onChange={handleChange}
+          required
+          className="border-[#09B2A0] focus-visible:ring-[#09B2A0]"
+          disabled={formStatus.isSubmitting}
+        />
+        <Input
+          type="text"
+          name="subject"
+          placeholder="Sujet"
+          value={formData.subject}
+          onChange={handleChange}
+          required
+          className="border-[#09B2A0] focus-visible:ring-[#09B2A0]"
+          disabled={formStatus.isSubmitting}
+        />
+        <Textarea
+          name="message"
+          placeholder="Message"
+          value={formData.message}
+          onChange={handleChange}
+          required
+          className="min-h-[180px] flex-1 border-[#09B2A0] focus-visible:ring-[#09B2A0]"
+          disabled={formStatus.isSubmitting}
+        />
+      </div>
+      <Button
+        type="submit"
+        className="mt-4 w-full bg-[#09B2A0] text-white transition-all duration-300 hover:bg-[#078C80] hover:shadow-md"
+        disabled={formStatus.isSubmitting}
+      >
+        {formStatus.isSubmitting ? "Envoi en cours..." : "Envoyer"}
+      </Button>
+      <p className="mt-2 text-xs text-gray-500 text-center">
+        Votre message sera envoyé à {EMAIL_ADDRESS}
+      </p>
+    </form>
+  );
+};
+
+export default function KinasConsulting() {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const [showScrollTop, setShowScrollTop] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 50);
+      setShowScrollTop(window.scrollY > 500);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   const scrollToSection = (id: string) => {
-    setMobileMenuOpen(false)
-    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" })
-  }
+    setMobileMenuOpen(false);
+    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+  };
 
   const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: "smooth" })
-  }
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   const navLinks = [
     { name: "Accueil", id: "hero" },
     { name: "À Propos", id: "about" },
     { name: "Services", id: "services" },
-    { name: "Partenaires", id: "partners" },
+    { name: "Références", id: "partners" },
     { name: "Contact", id: "contact" },
-  ]
+  ];
+
+  const imagePaths = [
+    "/logos/aam.png",
+    "/logos/alBadil.png",
+    "/logos/amavi.png",
+    "/logos/artRue.png",
+    "/logos/cinerif.png",
+    "/logos/cnci.png",
+    "/logos/Menassa.png",
+    "/logos/safir.png",
+    "/logos/tacir.png",
+    "/logos/tfannen.png",
+    "/logos/zirda.png",
+  ];
 
   return (
-
     <div className="flex min-h-screen flex-col font-sans">
-      
       {/* Navbar */}
       <header
         className={cn(
           "fixed top-0 z-50 w-full transition-all duration-300",
-          scrolled ? "bg-white/95 shadow-md backdrop-blur-sm" : "bg-transparent",
+          scrolled ? "bg-white/95 shadow-md backdrop-blur-sm" : "bg-transparent"
         )}
       >
         <div className="container mx-auto flex h-20 max-w-7xl items-center justify-between px-4">
@@ -120,13 +224,17 @@ export default function KinasConsulting() {
                   className="object-contain"
                 />
               </div>
-              <span className={cn("text-xl font-bold transition-colors", scrolled ? "text-[#09B2A0]" : "text-white")}>
+              <span
+                className={cn(
+                  "text-xl font-bold transition-colors",
+                  scrolled ? "text-[#09B2A0]" : "text-white"
+                )}
+              >
                 <span className="hidden sm:inline">Kinas Consulting</span>
                 <span className="sm:hidden">Kinas</span>
               </span>
             </Link>
           </div>
-
           {/* Desktop Navigation */}
           <nav className="hidden md:block">
             <ul className="flex space-x-8">
@@ -136,7 +244,9 @@ export default function KinasConsulting() {
                     onClick={() => scrollToSection(link.id)}
                     className={cn(
                       "relative font-medium transition-colors after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 after:bg-[#09B2A0] after:transition-all after:duration-300 hover:after:w-full",
-                      scrolled ? "text-[#2C2C2C] hover:text-[#09B2A0]" : "text-white hover:text-[#6AE2D7]",
+                      scrolled
+                        ? "text-[#2C2C2C] hover:text-[#09B2A0]"
+                        : "text-white hover:text-[#6AE2D7]"
                     )}
                   >
                     {link.name}
@@ -145,7 +255,6 @@ export default function KinasConsulting() {
               ))}
             </ul>
           </nav>
-
           {/* Mobile Menu Button */}
           <button
             className={cn("z-50 md:hidden", scrolled ? "text-[#2C2C2C]" : "text-white")}
@@ -154,12 +263,11 @@ export default function KinasConsulting() {
           >
             {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
           </button>
-
           {/* Mobile Navigation */}
           <div
             className={cn(
               "fixed inset-0 z-40 flex flex-col items-center justify-center bg-gradient-to-b from-white/95 to-[#09B2A0]/20 backdrop-blur-sm transition-all duration-300 md:hidden",
-              mobileMenuOpen ? "opacity-100" : "pointer-events-none opacity-0",
+              mobileMenuOpen ? "opacity-100" : "pointer-events-none opacity-0"
             )}
           >
             <nav className="flex w-full max-w-sm flex-col items-center space-y-6 px-4">
@@ -178,7 +286,10 @@ export default function KinasConsulting() {
       </header>
 
       {/* Hero Section */}
-      <section id="hero" className="relative flex min-h-[100vh] flex-col items-center justify-center px-4 text-white">
+      <section
+        id="hero"
+        className="relative flex min-h-[100vh] flex-col items-center justify-center px-4 text-white"
+      >
         {/* Background Image */}
         <div className="absolute inset-0 z-0">
           <Image
@@ -189,11 +300,7 @@ export default function KinasConsulting() {
             priority
           />
           <div className="absolute inset-0 bg-gradient-to-r from-[#078C80]/80 to-[#09B2A0]/70"></div>
-          
-
-
         </div>
-        
         {/* Dynamic Overlay Patterns */}
         <div className="absolute inset-0 z-5">
           <div
@@ -203,18 +310,13 @@ export default function KinasConsulting() {
             }}
           ></div>
         </div>
-
         <div className="container relative z-20 mx-auto max-w-5xl px-4 text-center">
           <div className="animate-fadeIn">
             <h1 className="mb-4 text-3xl font-bold leading-tight tracking-tighter sm:text-4xl md:text-5xl lg:text-6xl">
               Kinas Consulting
             </h1>
             <p className="mb-6 text-lg font-medium italic sm:text-xl md:text-2xl animate-fadeInUp">
-              catalyseur d&apos;impact.
-            </p>
-            <p className="mx-auto mb-8 max-w-2xl text-base sm:text-lg md:text-xl animate-fadeInUp animation-delay-300">
-              Kinas Consulting accompagne les institutions nationales et internationales dans la conception, la gestion
-              et l&apos;évaluation de projets à fort impact.
+              Catalyseur d&apos;Impact.
             </p>
             <Button
               size="lg"
@@ -225,7 +327,6 @@ export default function KinasConsulting() {
             </Button>
           </div>
         </div>
-
         <div className="absolute bottom-10 left-1/2 z-20 -translate-x-1/2 animate-bounce">
           <button onClick={() => scrollToSection("about")} aria-label="Scroll down">
             <svg
@@ -275,7 +376,6 @@ export default function KinasConsulting() {
               </p>
             </div>
           </div>
-
           <div className="flex flex-col items-center md:flex-row-reverse md:gap-10">
             <div className="mb-8 flex justify-center md:mb-0 md:w-1/3">
               <div className="group relative h-64 w-64 overflow-hidden rounded-lg shadow-lg transition-all duration-500 hover:shadow-xl">
@@ -290,12 +390,25 @@ export default function KinasConsulting() {
             </div>
             <div className="md:w-2/3">
               <h3 className="mb-4 text-xl font-bold text-[#078C80]">Mouadh Gammoudi, Fondateur</h3>
-              <p className="text-lg leading-relaxed text-[#2C2C2C]">
-                Mouadh Gammoudi, architecte de formation et spécialiste en gestion de projets, a acquis plus de dix ans
-                d&apos;expérience sur le terrain. Son expertise des dynamiques institutionnelles et territoriales, ainsi
-                que son vaste réseau d&apos;experts dans divers domaines stratégiques, lui permettent d&apos;apporter
-                des solutions adaptées et efficaces aux projets qu&apos;il accompagne.
-              </p>
+              <div className="relative">
+                <div className="relative max-h-[120px] overflow-hidden">
+                  <p className="text-lg leading-relaxed text-[#2C2C2C]">
+                    Mouadh Gammoudi, architecte de formation et spécialiste en gestion de projets, a acquis plus de dix ans
+                    d&apos;expérience sur le terrain. Son expertise des dynamiques institutionnelles et territoriales, ainsi
+                    que son vaste réseau d&apos;experts dans divers domaines stratégiques, lui permettent d&apos;apporter
+                    des solutions adaptées et efficaces aux projets qu&apos;il accompagne. Il a dirigé avec succès de nombreux projets
+                    d&apos;envergure nationale et internationale, démontrant une capacité exceptionnelle à fédérer les équipes et à
+                    atteindre les objectifs fixés.
+                  </p>
+                </div>
+                <div className="absolute bottom-0 left-0 h-24 w-full bg-gradient-to-t from-white via-white/90 to-transparent"></div>
+                <Link
+                  href="/cv"
+                  className="absolute -bottom-2 left-1/2 -translate-x-1/2 transform rounded-md bg-[#09B2A0] px-6 py-2 text-white transition-all duration-300 hover:bg-[#078C80] hover:shadow-md"
+                >
+                  Voir CV Complet
+                </Link>
+              </div>
             </div>
           </div>
         </div>
@@ -308,18 +421,16 @@ export default function KinasConsulting() {
         <div className="absolute -bottom-20 -right-20 h-40 w-40 rounded-full bg-[#09B2A0]/10"></div>
         <div className="absolute left-1/4 top-1/3 h-20 w-20 rounded-full bg-[#09B2A0]/5"></div>
         <div className="absolute bottom-1/4 right-1/3 h-16 w-16 rounded-full bg-[#09B2A0]/5"></div>
-
         {/* Background Pattern */}
         <div className="absolute inset-0 opacity-5">
           <div
             className="h-full w-full"
             style={{
-              backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='88' height='24' viewBox='0 0 88 24'%3E%3Cg fillRule='evenodd'%3E%3Cg id='autumn' fill='%2309B2A0' fillOpacity='1'%3E%3Cpath d='M10 0l30 15 2 1V2.18A10 10 0 0 0 41.76 0H39.7a8 8 0 0 1 .3 2.18v10.58L14.47 0H10zm31.76 24a10 10 0 0 0-5.29-6.76L4 1 2 0v13.82a10 10 0 0 0 5.53 8.94L10 24h4.47l-6.05-3.02A8 8 0 0 1 4 13.82V3.24l31.58 15.78A8 8 0 0 1 39.7 24h2.06zM78 24l2.47-1.24A10 10 0 0 0 86 13.82V0l-2 1-32.47 16.24A10 10 0 0 0 46.24 24h2.06a8 8 0 0 1 4.12-4.98L84 3.24v10.58a8 8 0 0 1-4.42 7.16L73.53 24H78zm0-24L48 15l-2 1V2.18A10 10 0 0 1 46.24 0h2.06a8 8 0 0 0-.3 2.18v10.58L73.53 0H78z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+              backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='88' height='24' viewBox='0 0 88 24'%3E%3Cg fillRule='evenodd'%3E%3Cg id='autumn' fill='%2309B2A0' fillOpacity='1'%3E%3Cpath d='M10 0l30 15 2 1V2.18A10 10 0 0 0 41.76 0H39.7a8 8 0 0 1 .3 2.18v10.58L14.47 0H10zm31.76 24a10 10 0 0 0-5.29-6.76L4 1 2 0v13.82a10 10 0 0 0 5.53 8.94L10 24h4.47l-6.05-3.02A8 8 0 0 1 4 13.82V3.24l31.58 15.78A8 8 0 0 1 39.7 24h2.06zM78 24l2.47-1.24A10 10 0 0 0 86 13.82V0l-2 1-32.47 16.24A10 10 0 0 0 46.24 24h2.06a8 8 0 0 0-.3 2.18v10.58L73.53 24H78zm0-24L48 15l-2 1V2.18A10 10 0 0 1 46.24 0h2.06a8 8 0 0 0-.3 2.18v10.58L73.53 0H78z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
               backgroundSize: "88px 24px",
             }}
           ></div>
         </div>
-
         <div className="container relative z-10 mx-auto max-w-5xl px-4">
           <h2 className="mb-12 text-center text-3xl font-bold tracking-tight text-[#2C2C2C] md:text-4xl">
             Nos Services
@@ -436,22 +547,20 @@ export default function KinasConsulting() {
       <section id="partners" className="relative py-20">
         <div className="container relative z-10 mx-auto max-w-5xl px-4">
           <h2 className="mb-12 text-center text-3xl font-bold tracking-tight text-[#2C2C2C] md:text-4xl">
-            Nos Partenaires
+            Références
             <div className="mx-auto mt-2 h-1 w-20 bg-[#09B2A0]"></div>
           </h2>
           <p className="mx-auto mb-12 max-w-3xl text-center text-lg text-[#2C2C2C]">
-            Nous accompagnons les institutions nationales et internationales, organisations publiques et privées,
-            bailleurs de fonds, ONG et initiatives locales engagées dans des projets à fort impact.
+            Ces références témoignent de la confiance accordée au fondateur.
           </p>
-          {/*
           <div className="grid grid-cols-2 gap-8 md:grid-cols-3 lg:grid-cols-4">
-            {Array.from({ length: 8 }).map((_, index) => (
+            {imagePaths.map((imagePath, index) => (
               <div
                 key={index}
                 className="group flex items-center justify-center rounded-lg bg-[#F5F5F5] p-4 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md"
               >
                 <Image
-                  src="/placeholder.svg?height=80&width=120"
+                  src={imagePath}
                   alt={`Partner ${index + 1}`}
                   width={120}
                   height={80}
@@ -459,7 +568,7 @@ export default function KinasConsulting() {
                 />
               </div>
             ))}
-          </div>*/}
+          </div>
         </div>
       </section>
 
@@ -468,7 +577,6 @@ export default function KinasConsulting() {
         {/* Decorative Elements */}
         <div className="absolute -left-10 top-20 h-20 w-20 rounded-full bg-[#09B2A0]/10"></div>
         <div className="absolute -right-10 bottom-20 h-20 w-20 rounded-full bg-[#09B2A0]/10"></div>
-
         {/* Background Pattern */}
         <div className="absolute inset-0 opacity-5">
           <div
@@ -479,89 +587,13 @@ export default function KinasConsulting() {
             }}
           ></div>
         </div>
-
         <div className="container relative z-10 mx-auto max-w-5xl px-4">
           <h2 className="mb-12 text-center text-3xl font-bold tracking-tight text-[#2C2C2C] md:text-4xl">
             Contactez-nous
             <div className="mx-auto mt-2 h-1 w-20 bg-[#09B2A0]"></div>
           </h2>
           <div className="grid gap-8 md:grid-cols-2">
-            <div className="transform transition-all duration-500 hover:scale-[1.02]">
-              <form onSubmit={handleSubmit} className="flex h-full flex-col rounded-lg bg-white p-6 shadow-lg">
-                {formStatus.isSubmitted && (
-                  <div
-                    className={`mb-4 flex items-center rounded-md p-3 ${formStatus.success ? "bg-green-50 text-green-700" : "bg-red-50 text-red-700"}`}
-                  >
-                    {formStatus.success ? (
-                      <CheckCircle className="mr-2 h-5 w-5 text-green-500" />
-                    ) : (
-                      <AlertCircle className="mr-2 h-5 w-5 text-red-500" />
-                    )}
-                    <span>{formStatus.message}</span>
-                  </div>
-                )}
-
-                <div className="flex-1 space-y-4">
-                  <div>
-                    <Input
-                      type="text"
-                      name="name"
-                      placeholder="Nom"
-                      value={formData.name}
-                      onChange={handleChange}
-                      required
-                      className="border-[#09B2A0] focus-visible:ring-[#09B2A0]"
-                      disabled={formStatus.isSubmitting}
-                    />
-                  </div>
-                  <div>
-                    <Input
-                      type="email"
-                      name="email"
-                      placeholder="Email"
-                      value={formData.email}
-                      onChange={handleChange}
-                      required
-                      className="border-[#09B2A0] focus-visible:ring-[#09B2A0]"
-                      disabled={formStatus.isSubmitting}
-                    />
-                  </div>
-                  <div>
-                    <Input
-                      type="text"
-                      name="subject"
-                      placeholder="Sujet"
-                      value={formData.subject}
-                      onChange={handleChange}
-                      required
-                      className="border-[#09B2A0] focus-visible:ring-[#09B2A0]"
-                      disabled={formStatus.isSubmitting}
-                    />
-                  </div>
-                  <div className="flex-1">
-                    <Textarea
-                      name="message"
-                      placeholder="Message"
-                      value={formData.message}
-                      onChange={handleChange}
-                      required
-                      className="min-h-[180px] flex-1 border-[#09B2A0] focus-visible:ring-[#09B2A0]"
-                      disabled={formStatus.isSubmitting}
-                    />
-                  </div>
-                </div>
-                <Button
-                  type="submit"
-                  className="mt-4 w-full bg-[#09B2A0] text-white transition-all duration-300 hover:bg-[#078C80] hover:shadow-md"
-                  disabled={formStatus.isSubmitting}
-                >
-                  {formStatus.isSubmitting ? "Envoi en cours..." : "Envoyer"}
-                </Button>
-                <p className="mt-2 text-xs text-gray-500 text-center">
-                  Votre message sera envoyé à kinasconsult@gmail.com
-                </p>
-              </form>
-            </div>
+            <ContactForm />
             <div className="flex h-full flex-col space-y-6">
               <div className="h-64 w-full overflow-hidden rounded-lg bg-gray-200 shadow-lg transition-all duration-500 hover:shadow-xl">
                 <iframe
@@ -587,10 +619,10 @@ export default function KinasConsulting() {
                     <Mail className="h-5 w-5 text-[#09B2A0]" />
                   </div>
                   <a
-                    href="mailto:kinasconsult@gmail.com"
+                    href={`mailto:${EMAIL_ADDRESS}`}
                     className="transition-colors hover:text-[#09B2A0] hover:underline"
                   >
-                    kinasconsult@gmail.com
+                    {EMAIL_ADDRESS}
                   </a>
                 </div>
                 <div className="flex items-center gap-3">
@@ -646,18 +678,17 @@ export default function KinasConsulting() {
         </div>
       </footer>
 
-      {/* Scroll to top button */}
+      {/* Scroll to Top Button */}
       <button
         onClick={scrollToTop}
         className={cn(
           "fixed bottom-6 right-6 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-[#09B2A0] text-white shadow-lg transition-all duration-300 hover:bg-[#078C80]",
-          showScrollTop ? "opacity-100" : "pointer-events-none opacity-0",
+          showScrollTop ? "opacity-100" : "pointer-events-none opacity-0"
         )}
         aria-label="Scroll to top"
       >
         <ChevronUp className="h-6 w-6" />
       </button>
     </div>
-  )
+  );
 }
-
