@@ -200,7 +200,7 @@ export default function KinasConsulting() {
     "/logos/safir.png",
     "/logos/tacir.png",
     "/logos/tfannen.png",
-    "/logos/zirda.png",
+    "/logos/Zirda.png",
   ];
 
   return (
@@ -217,7 +217,7 @@ export default function KinasConsulting() {
             <Link href="#" className="flex items-center gap-2" onClick={() => scrollToSection("hero")}>
               <div className="relative h-10 w-10 overflow-hidden rounded-full border-2 border-[#09B2A0]">
                 <Image
-                  src="/KinasConsultingLogo.png"
+                  src="/kinasConsultingLogo.png"
                   alt="Kinas Consulting Logo"
                   width={40}
                   height={40}
