@@ -41,9 +41,9 @@ const ContactForm = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-  
+
     setFormStatus({ ...formStatus, isSubmitting: true, isSubmitted: false })
-  
+
     try {
       const result = await sendEmail(formData)
       if (result.success) {
@@ -91,9 +91,8 @@ const ContactForm = () => {
     <form onSubmit={handleSubmit} className="flex h-full flex-col rounded-lg bg-white p-6 shadow-lg">
       {formStatus.isSubmitted && (
         <div
-          className={`mb-4 flex items-center rounded-md p-3 ${
-            formStatus.success ? "bg-green-50 text-green-700" : "bg-red-50 text-red-700"
-          }`}
+          className={`mb-4 flex items-center rounded-md p-3 ${formStatus.success ? "bg-green-50 text-green-700" : "bg-red-50 text-red-700"
+            }`}
         >
           {formStatus.success ? (
             <CheckCircle className="mr-2 h-5 w-5 text-green-500" />
@@ -190,17 +189,17 @@ export default function KinasConsulting() {
   ];
 
   const imagePaths = [
-    "/logos/aam.png",
-    "/logos/alBadil.png",
-    "/logos/amavi.png",
-    "/logos/artRue.png",
-    "/logos/cinerif.png",
-    "/logos/cnci.png",
-    "/logos/Menassa.png",
-    "/logos/safir.png",
-    "/logos/tacir.png",
-    "/logos/tfannen.png",
-    "/logos/Zirda.png",
+    { src: "/logos/aam.png", link: "https://www.facebook.com/AssociationArtAMaknassy/" },
+    { src: "/logos/alBadil.png", link: "https://al-badil.net/" },
+    { src: "/logos/amavi.png", link: "https://www.facebook.com/asso.amavi" },
+    { src: "/logos/artRue.png", link: "https://lartrue.org/" },
+    { src: "/logos/cinerif.png", link: "https://www.facebook.com/Cineryf" },
+    { src: "/logos/cnci.png", link: "https://cnci.tn/" },
+    { src: "/logos/Menassa.png", link: "https://www.facebook.com/altertunisia" },
+    { src: "/logos/safir.png", link: "https://www.safir-eu.com/" },
+    { src: "/logos/tacir.png", link: "https://www.tacir.tn/" },
+    { src: "/logos/tfannen.png", link: "https://www.facebook.com/TfanenTunisieCreative" },
+    { src: "/logos/Zirda.png", link: "#" },
   ];
 
   return (
@@ -263,25 +262,43 @@ export default function KinasConsulting() {
           >
             {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
           </button>
-          {/* Mobile Navigation */}
-          <div
-            className={cn(
-              "fixed inset-0 z-40 flex flex-col items-center justify-center bg-gradient-to-b from-white/95 to-[#09B2A0]/20 backdrop-blur-sm transition-all duration-300 md:hidden",
-              mobileMenuOpen ? "opacity-100" : "pointer-events-none opacity-0"
-            )}
-          >
-            <nav className="flex w-full max-w-sm flex-col items-center space-y-6 px-4">
+        </div>
+
+        {/* Mobile Navigation */}
+        <div
+          className={cn(
+            "fixed inset-x-0 top-20 z-40 transform bg-white shadow-lg transition-all duration-300 md:hidden",
+            mobileMenuOpen ? "translate-y-0 opacity-100" : "-translate-y-full opacity-0",
+          )}
+        >
+          <nav className="container mx-auto max-w-7xl px-4 py-4">
+            <div className="grid gap-2">
               {navLinks.map((link) => (
                 <button
                   key={link.id}
                   onClick={() => scrollToSection(link.id)}
-                  className="w-full rounded-lg bg-white/80 py-3 text-center text-lg font-medium text-[#2C2C2C] shadow-sm transition-all hover:bg-[#09B2A0]/10 hover:text-[#09B2A0] hover:shadow-md active:scale-95"
+                  className="flex w-full items-center justify-between rounded-md px-4 py-3 text-left text-[#2C2C2C] transition-all hover:bg-[#09B2A0]/10 hover:text-[#09B2A0] active:bg-[#09B2A0]/20"
                 >
-                  {link.name}
+                  <span className="font-medium">{link.name}</span>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="h-4 w-4"
+                  >
+                    <path d="m9 18 6-6-6-6" />
+                  </svg>
                 </button>
               ))}
-            </nav>
-          </div>
+
+            </div>
+          </nav>
         </div>
       </header>
 
@@ -554,18 +571,17 @@ export default function KinasConsulting() {
             Ces références témoignent de la confiance accordée au fondateur.
           </p>
           <div className="grid grid-cols-2 gap-8 md:grid-cols-3 lg:grid-cols-4">
-            {imagePaths.map((imagePath, index) => (
-              <div
-                key={index}
-                className="group flex items-center justify-center rounded-lg bg-[#F5F5F5] p-4 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md"
-              >
-                <Image
-                  src={imagePath}
-                  alt={`Partner ${index + 1}`}
-                  width={120}
-                  height={80}
-                  className="h-20 w-auto object-contain transition-all duration-500 grayscale group-hover:grayscale-0"
-                />
+            {imagePaths.map((image, index) => (
+              <div key={index} className="group flex items-center justify-center rounded-lg bg-[#F5F5F5] p-4 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
+                <a href={image.link} target="_blank" rel="noopener noreferrer">
+                  <Image
+                    src={image.src}
+                    alt={`Partner ${index + 1}`}
+                    width={120}
+                    height={80}
+                    className="h-20 w-auto object-contain transition-all duration-500 grayscale group-hover:grayscale-0"
+                  />
+                </a>
               </div>
             ))}
           </div>
