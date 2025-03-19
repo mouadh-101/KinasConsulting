@@ -200,6 +200,8 @@ export default function KinasConsulting() {
     { src: "/logos/tacir.png", link: "https://www.tacir.tn/" },
     { src: "/logos/tfannen.png", link: "https://www.facebook.com/TfanenTunisieCreative" },
     { src: "/logos/Zirda.png", link: "#" },
+    {src:"/logos/GoethInst.png", link: "https://www.goethe.de/ins/tn/fr/index.html"},
+    {src:"/logos/BritchCons.png", link: "https://www.britishcouncil.tn/fr"},
   ];
 
   return (
